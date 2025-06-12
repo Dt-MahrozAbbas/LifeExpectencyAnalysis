@@ -978,19 +978,34 @@ elif page == "Life Expectancy Predicted Model":
         # Plot regression plots for each selected feature
         st.header("📊 FEATURE RELATIONSHIPS")
         for feature in selected_features:
+            x_vals = df[[feature]].values
+            y_vals = df['Life_expectancy'].values
+
+            # Fit linear model
+            reg = LinearRegression()
+            reg.fit(x_vals, y_vals)
+            y_pred_line = reg.predict(x_vals)
+
+            # Create scatter plot with regression line manually
             fig_reg = px.scatter(
                 df,
                 x=feature,
                 y='Life_expectancy',
-                trendline="ols",
                 title=f"LIFE EXPECTANCY VS {feature.upper()}",
                 color='Life_expectancy',
                 color_continuous_scale='RdBu'
             )
-            fig_reg.update_traces(
-                line=dict(color='#1E88E5', width=2)
+
+            # Add regression line
+            fig_reg.add_traces(
+                px.line(
+                    x=df[feature],
+                    y=y_pred_line,
+                ).data
             )
+
             plot_figure(fig_reg)
+
         
         # Train model on selected features
         model.fit(X_train_selected, y_train)
